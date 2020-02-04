@@ -1,6 +1,6 @@
 import cv2
 
-capture = cv2.VideoCapture('rtsp://119.2.52.175:9997/s2')
+capture = cv2.VideoCapture('rtsp://119.2.52.175:9997/s0')
 
 def toGray(img):
     return cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
