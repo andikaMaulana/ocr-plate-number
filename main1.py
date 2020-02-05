@@ -61,7 +61,7 @@ def replaceToHuruf(val):
 
 
 def getPlat(plat):
-    print(plat)
+    
     pl0 = ""
     pl1 = ""
     pl2 = ""
@@ -106,44 +106,79 @@ def getPlat(plat):
 def removeSymbol(val):
     val  = re.sub("[^0-9a-zA-Z]","",val)
     return val
+val = 0
 
 def ocrNum(img):
+    global val
     plate = ""
     tres = 60
-    max_tres = 240
+    max_tres = 210
+    imgProc=img
     while tres < max_tres:
         imgProc = toBin(img,tres)
         imgProc = gaussianBlur(imgProc)
         extracted_text_mod = ocr_core(imgProc)
         extracted_text_mod=removeSymbol(extracted_text_mod)
+        #cv2.imshow(f't: {tres} : {extracted_text_mod}', imgProc)
+        # print(extracted_text_mod)
         if len(extracted_text_mod) > 6:
             pl0,pl1,pl2  = getPlat(extracted_text_mod)
             if pl0 !="" and pl1 !="" and pl2 !="" and len(pl1)>3:
                 print(tres)
+                val+=tres
                 plate = pl0+"-"+pl1+"-"+pl2
                 break
         tres+=5
-    return plate
+    return plate,imgProc
 
-originalImage = cv2.imread('data/plate5.png')
-# originalImage = cv2.resize(originalImage, None, fx=1.2, fy=1.2, interpolation=cv2.INTER_CUBIC)
-originalImage = toRgb(originalImage)
-originalImage = toGray(originalImage)
-imgProc = cropImg(originalImage)
-# imgProc = toBin(originalImage,70)
+
+
+###############
+# nopol = input("nomor gambar : ")
+# originalImage = cv2.imread('data/plate'+nopol+'.png')
+# originalImage = toRgb(originalImage)
+# originalImage = toGray(originalImage)
+# w,h = originalImage.shape
+# total = w*h
+# bl = np.sum(originalImage >= 127) / total *100
+# wh = np.sum(originalImage < 127) / total *100
+# print(f"black : {bl}, wh : {wh}")
+# imgProc = cropImg(originalImage)
+# tre=int(input("treshold : "))
+# imgProc = toBin(originalImage,tre)
 # imgProc = gaussianBlur(imgProc)
-now = time.time()
-cv2.imshow('output', imgProc)
-cv2.imshow('original', originalImage)
+# extracted_text_ori = ocr_core(originalImage)
+# now = time.time()
+# extracted_text = ocr_core(imgProc)
+# print(f"original : {extracted_text_ori}\n processing : {extracted_text} \ntime : {time.time()-now}")
+# cv2.imshow('output', imgProc)
+# cv2.imshow('original', originalImage)
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
 
-extracted_text_ori = ocr_core(originalImage)
-# extracted_text_mod = ocr_core(imgProc)
-# extracted_text_mod=removeSymbol(extracted_text_mod)
-# extracted_text  = getPlat(extracted_text_mod)
 
-extracted_text = ocrNum(imgProc)
+#########
+i=1
 
-print(f"original : {extracted_text_ori}\n processing : {extracted_text} \ntime : {time.time()-now}")
+while i < 50 :
+    originalImage = cv2.imread('data/plate'+str(i)+'.png')
+    originalImage = toRgb(originalImage)
+    originalImage = toGray(originalImage)
+    imgProc = cropImg(originalImage)
+    w,h = imgProc.shape
+    total = w*h
+    bl = np.sum(imgProc >= 127) / total *100
+    wh = np.sum(imgProc < 127) / total *100
+    extracted_text_ori = ocr_core(originalImage)
+    now = time.time()
+    extracted_text,imgProc = ocrNum(imgProc)
+    if extracted_text != "":
+        print(f'v: {extracted_text}. t: {time.time()-now}')
+        print(f"black : {bl}, wh : {wh}\n")
+    i+=1
+#     cv2.imshow('original'+str(i), imgProc)
 
-cv2.waitKey(0)
-cv2.destroyAllWindows()
+
+# print(f"rata-rata t : {val/19}")
+# cv2.waitKey(0)
+# cv2.destroyAllWindows()
