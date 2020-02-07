@@ -124,32 +124,6 @@ def getPlat(plat):
 def removeSymbol(val):
     val  = re.sub("[^0-9a-zA-Z]","",val)
     return val
-val = 0
-
-def ocrNum(img):
-    global val
-    plate = ""
-    tres = 60
-    max_tres = 210
-    imgProc=img
-    while tres < max_tres:
-        imgProc = toBin(img,tres)
-        imgProc = gaussianBlur(imgProc)
-        extracted_text_mod = ocr_core(imgProc)
-        extracted_text_mod=removeSymbol(extracted_text_mod)
-        #cv2.imshow(f't: {tres} : {extracted_text_mod}', imgProc)
-        # print(extracted_text_mod)
-        if len(extracted_text_mod) > 6:
-            pl0,pl1,pl2  = getPlat(extracted_text_mod)
-            if pl0 !="" and pl1 !="" and pl2 !="" and len(pl1)>3:
-                print(tres)
-                val+=tres
-                plate = pl0+"-"+pl1+"-"+pl2
-                break
-        tres+=1
-    return plate,imgProc,tres
-
-
 
 ###############
 # nopol = input("nomor gambar : ")
@@ -184,9 +158,7 @@ def ocrNum(img):
 i=1
 grayVal['data']=[]
 d=0
-now  = time.time()
-jum=0
-while i < 102 :
+while i < 101 :
     originalImage = cv2.imread('data/plate'+str(i)+'.png')
     originalImage = toRgb(originalImage)
     originalImage = toGray(originalImage)
@@ -205,37 +177,12 @@ while i < 102 :
     imgProc = toBin(imgProc,tre)
     imgProc = gaussianBlur(imgProc)
     extracted_text =ocr_core(imgProc)
-    prc =time.time()
     if len(extracted_text) > 5:
         extracted_text_mod=removeSymbol(extracted_text)
         pl0,pl1,pl2  = getPlat(extracted_text_mod)
         if pl0 !="" and pl1!="" and pl2!="": 
             extracted_text=pl0+"-"+pl1+"-"+pl2
-            jum+=time.time()-prc
-            print(f'out : {extracted_text}, tres:{tre}, time: {jum}')
+            print(f'out : {extracted_text}, t:{tre}')
             d+=1
     i+=1
-print(f'deteksi : {d}, t: {time.time()-now}, j: {jum}')
-    #######
-
-    # extracted_text,imgProc,tres = ocrNum(imgProc)
-    # if extracted_text != "":
-    #     print(f'v: {extracted_text}. t: {time.time()-now}')
-    #     print(f"black : {bl}, wh : {wh}\n")
-    #     grayVal['data'].append({
-    #         'plate':extracted_text,
-    #         'treshold':tres,
-    #         'b':bl,
-    #         'w':wh
-    #     })
-    # i+=1
-# with open('data1.txt','w') as outfile:
-#     json.dump(grayVal,outfile)
-# ############
-
-#     cv2.imshow('original'+str(i), imgProc)
-
-
-# print(f"rata-rata t : {val/19}")
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
+print(f'deteksi : {d}')
