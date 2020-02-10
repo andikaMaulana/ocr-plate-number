@@ -57,11 +57,6 @@ class Plate:
     def rotateImg(self,img,angle):
         return imutils.rotate_bound(img, angle)
 
-    def cropImg(self,img):
-        h, w= img.shape
-        return img[5:0+h-10, 6:0+w]
-        
-
     def replaceToAngka(self,val):
         for i in self.to_angka:
             if val==i[0]:
@@ -80,6 +75,8 @@ class Plate:
         pl0 = ""
         pl1 = ""
         pl2 = ""
+        if len(plat) <3:
+            return ""
         #get plat kota
         for i in range(0,2):
             try:
@@ -122,16 +119,32 @@ class Plate:
                 break
         return pl0+"-"+pl1+"-"+pl2
     
+    def cropImg(self,img,t,b,l,r):
+        h, w= img.shape
+        return img[0+t:h-b, 0+l:w-r]
+
+    # def getTeks(img):
+    #     img = plate.toGray(img)
+    #     img = plate.toBin(img,90)
+    #     img =plate.gaussianBlur(img)
+    #     img = plate.rotateImg(img,353)
+    #     img = plate.cropImg(img,20,30,20,20)
+    #     teks =plate.ocr_core(img)
+    #     return teks
+    def toTreshOtsu(self,img):
+        ret,thresh = cv2.threshold(img, 120,255,cv2.THRESH_BINARY_INV, cv2.THRESH_OTSU)
+        return thresh
+
     def getText(self,img):
-        originalImage = self.toGray(img)
-        imgProc = self.cropImg(originalImage)
+        imgProc = self.toGray(img)
+        #imgProc = self.cropImg(originalImage)
 
-        w,h = imgProc.shape
-        total = w*h
-        bl = np.sum(imgProc >= 127) / total *100
-        wh = np.sum(imgProc < 127) / total *100
-        tre = self.getTresh(bl,wh)
-
+        # w,h = imgProc.shape
+        # total = w*h
+        # bl = np.sum(imgProc >= 127) / total *100
+        # wh = np.sum(imgProc < 127) / total *100
+        # tre = self.getTresh(bl,wh)
+        tre = 70
         imgProc = self.toBin(imgProc,tre)
         imgProc = self.gaussianBlur(imgProc)
         extracted_text = self.ocr_core(imgProc)

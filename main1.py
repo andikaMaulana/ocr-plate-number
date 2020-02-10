@@ -186,7 +186,7 @@ grayVal['data']=[]
 d=0
 now  = time.time()
 jum=0
-while i < 102 :
+while i < 101 :
     originalImage = cv2.imread('data/plate'+str(i)+'.png')
     originalImage = toRgb(originalImage)
     originalImage = toGray(originalImage)
@@ -196,7 +196,6 @@ while i < 102 :
     bl = np.sum(imgProc >= 127) / total *100
     wh = np.sum(imgProc < 127) / total *100
     extracted_text_ori = ocr_core(originalImage)
-    now = time.time()
 
     #######
 
